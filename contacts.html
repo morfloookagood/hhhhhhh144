@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты | Aroma Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Подключение Яндекс.Карт API -->
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_api_ключ&lang=ru_RU"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #ffffff; color: #1a1a1a; line-height: 1.5; }
+        :root {
+            --accent-dark: #a57c52;
+            --text-dark: #1f1f1f;
+            --text-muted: #5a5a5a;
+            --border-light: #eaeaea;
+            --bg-light: #f9f9f9;
+            --shadow-sm: 0 8px 20px rgba(0,0,0,0.02);
+        }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+        .btn { display: inline-block; background: var(--text-dark); color: white; padding: 12px 28px; border-radius: 40px; text-decoration: none; font-weight: 500; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; }
+        .btn:hover { background: var(--accent-dark); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        header { padding: 24px 0; position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); z-index: 100; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-size: 1.6rem; font-weight: 600; text-decoration: none; color: var(--text-dark); }
+        .logo span { color: var(--accent-dark); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-dark); }
+        .page-title { padding: 60px 0 40px; background: var(--bg-light); }
+        h1 { font-size: 3rem; font-weight: 500; }
+        .section-subtitle { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-dark); margin-bottom: 1rem; }
+        .contacts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; padding: 60px 0; }
+        .contact-info { padding-right: 40px; }
+        .contact-detail { margin-bottom: 32px; display: flex; align-items: flex-start; gap: 16px; }
+        .contact-icon { width: 48px; height: 48px; background: var(--bg-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--accent-dark); }
+        .contact-text h3 { font-size: 1.1rem; margin-bottom: 6px; font-weight: 500; }
+        .contact-text p { color: var(--text-muted); }
+        .contact-text a { color: var(--text-muted); text-decoration: none; }
+        .contact-text a:hover { color: var(--accent-dark); }
+        .form-card { background: var(--bg-light); padding: 40px; border-radius: 32px; }
+        .form-group { margin-bottom: 20px; }
+        input, textarea, select { width: 100%; padding: 14px 18px; border: 1px solid var(--border-light); border-radius: 32px; font-family: inherit; font-size: 0.9rem; background: white; transition: 0.2s; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(192, 160, 128, 0.2); }
+        .map-container { margin-top: 40px; border-radius: 32px; overflow: hidden; border: 1px solid var(--border-light); }
+        #map { width: 100%; height: 400px; background: #e2d9d0; }
+        .working-hours { margin-top: 40px; padding: 32px; background: var(--bg-light); border-radius: 32px; text-align: center; }
+        .working-hours h3 { margin-bottom: 16px; }
+        .hours-list { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .hours-item { text-align: center; }
+        .hours-day { font-weight: 600; }
+        .hours-time { color: var(--text-muted); }
+        footer { background: #faf8f5; padding: 48px 0 32px; border-top: 1px solid var(--border-light); margin-top: 40px; }
+        .footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; }
+        .footer-col h4 { font-weight: 500; margin-bottom: 16px; }
+        .footer-col a { color: var(--text-muted); text-decoration: none; display: block; margin-bottom: 8px; }
+        .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-family: 'Inter', sans-serif; }
+        @media (max-width: 768px) { .container { padding: 0 24px; } .nav-links { gap: 1rem; } h1 { font-size: 2rem; } .contacts-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div id="toast" class="toast-msg">✨ Спасибо! Мы свяжемся с вами в ближайшее время</div>
+
+<header>
+    <div class="container header-flex">
+        <a href="index.html" class="logo">AROMA<span>LAB</span></a>
+        <ul class="nav-links">
+            <li><a href="services.html">Услуги</a></li>
+            <li><a href="catalog.html">Ароматы</a></li>
+            <li><a href="masterclass.html">Мастер-классы</a></li>
+            <li><a href="contacts.html" class="active">Контакты</a></li>
+        </ul>
+    </div>
+</header>
+
+<main>
+    <section class="page-title">
+        <div class="container">
+            <div class="section-subtitle">Свяжитесь с нами</div>
+            <h1>Контакты</h1>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="contacts-grid">
+            <div class="contact-info">
+                <div class="contact-detail">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="contact-text">
+                        <h3>Адрес</h3>
+                        <p>Москва, ул. Ароматная, д. 12<br>м. Курская (выход к ул. Земляной Вал)</p>
+                    </div>
+                </div>
+                <div class="contact-detail">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div class="contact-text">
+                        <h3>Телефон</h3>
+                        <p><a href="tel:+74951234567">+7 (495) 123-45-67</a></p>
+                        <p><a href="tel:+79161234567">+7 (916) 123-45-67</a> (WhatsApp)</p>
+                    </div>
+                </div>
+                <div class="contact-detail">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="contact-text">
+                        <h3>Email</h3>
+                        <p><a href="mailto:hello@aroma-lab.ru">hello@aroma-lab.ru</a></p>
+                        <p><a href="mailto:partners@aroma-lab.ru">partners@aroma-lab.ru</a> (для сотрудничества)</p>
+                    </div>
+                </div>
+                <div class="contact-detail">
+                    <div class="contact-icon"><i class="fab fa-instagram"></i></div>
+                    <div class="contact-text">
+                        <h3>Социальные сети</h3>
+                        <p><a href="#">@aroma_lab</a> — Instagram</p>
+                        <p><a href="#">t.me/aroma_lab</a> — Telegram</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="margin-bottom: 24px;">Написать нам</h3>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <input type="text" id="name" placeholder="Ваше имя" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="phone" placeholder="Телефон" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="E-mail">
+                    </div>
+                    <div class="form-group">
+                        <select id="subject">
+                            <option value="consultation">Консультация по созданию аромата</option>
+                            <option value="masterclass">Запись на мастер-класс</option>
+                            <option value="aromatization">Ароматизация интерьера</option>
+                            <option value="corporate">Корпоративное мероприятие</option>
+                            <option value="other">Другой вопрос</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea rows="4" id="message" placeholder="Ваше сообщение"></textarea>
+                    </div>
+                    <button type="submit" class="btn" id="submitBtn" style="width: 100%;">Отправить сообщение</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Интерактивная карта Яндекс.Карты с координатами 55.588003, 37.167939 -->
+        <div class="map-container">
+            <div id="map"></div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 12px 0; margin: 0;">
+                <i class="fas fa-location-dot"></i> г. Москва, ул. Ароматная, 12 | Координаты: 55.588003, 37.167939
+            </p>
+        </div>
+
+        <div class="working-hours">
+            <h3>Режим работы</h3>
+            <div class="hours-list">
+                <div class="hours-item">
+                    <div class="hours-day">Понедельник - Пятница</div>
+                    <div class="hours-time">10:00 - 20:00</div>
+                </div>
+                <div class="hours-item">
+                    <div class="hours-day">Суббота</div>
+                    <div class="hours-time">11:00 - 18:00</div>
+                </div>
+                <div class="hours-item">
+                    <div class="hours-day">Воскресенье</div>
+                    <div class="hours-time">Выходной</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container footer-grid">
+        <div class="footer-col"><h4>Aroma Lab</h4><p>Парфюмерная лаборатория с 2018 года.</p></div>
+        <div class="footer-col"><h4>Разделы</h4><a href="services.html">Услуги</a><a href="catalog.html">Ароматы</a><a href="masterclass.html">Мастер-классы</a><a href="contacts.html">Контакты</a></div>
+        <div class="footer-col"><h4>Контакты</h4><p>+7 (495) 123-45-67</p><p>hello@aroma-lab.ru</p></div>
+    </div>
+</footer>
+
+<script>
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const toastEl = document.getElementById('toast');
+    let isSubmitting = false;
+
+    function showToast(message, isError = false) {
+        toastEl.textContent = message || "✨ Спасибо! Мы свяжемся с вами в ближайшее время";
+        toastEl.style.backgroundColor = isError ? '#d32f2f' : '#1a1a1a';
+        toastEl.style.opacity = '1';
+        setTimeout(() => {
+            toastEl.style.opacity = '0';
+            toastEl.style.backgroundColor = '#1a1a1a';
+        }, 3000);
+    }
+
+    function resetForm() {
+        document.getElementById('name').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('subject').value = 'consultation';
+        document.getElementById('message').value = '';
+    }
+
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Защита от повторной отправки
+            if (isSubmitting) {
+                showToast("⏳ Пожалуйста, подождите, отправка уже выполняется...", false);
+                return;
+            }
+            
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            
+            if (!name || !phone) {
+                showToast("⚠️ Пожалуйста, укажите имя и телефон для связи", true);
+                return;
+            }
+            
+            // Блокируем кнопку
+            isSubmitting = true;
+            const originalButtonText = submitBtn.textContent;
+            submitBtn.textContent = "Отправка...";
+            submitBtn.disabled = true;
+            
+            // Имитация отправки на сервер (задержка 1 секунда)
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Успешная отправка
+                showToast("✅ Заявка принята! Менеджер свяжется с вами в течение 30 минут.", false);
+                resetForm();
+            } catch (error) {
+                showToast("❌ Ошибка отправки. Пожалуйста, попробуйте позже.", true);
+            } finally {
+                // Разблокируем кнопку
+                isSubmitting = false;
+                submitBtn.textContent = originalButtonText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+    
+    // Добавляем валидацию телефона (опционально)
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9+\-\(\)\s]/g, '');
+        });
+    }
+
+    // Инициализация Яндекс.Карты с координатами 55.588003, 37.167939
+    ymaps.ready(init);
+    
+    function init() {
+        // Координаты
+        const coords = [55.588003, 37.167939];
+        
+        // Создание карты
+        const map = new ymaps.Map("map", {
+            center: coords,
+            zoom: 17,
+            controls: ['zoomControl', 'fullscreenControl']
+        });
+        
+        // Добавление метки
+        const placemark = new ymaps.Placemark(coords, {
+            hintContent: 'Aroma Lab',
+            balloonContent: '<strong>Aroma Lab</strong><br>Москва, ул. Ароматная, 12<br>м. Курская'
+        }, {
+            preset: 'islands#redDotIcon',
+            iconColor: '#a57c52'
+        });
+        
+        map.geoObjects.add(placemark);
+        
+        // Открыть балун при загрузке
+        placemark.balloon.open();
+        
+        // Добавляем возможность увеличения по клику на метку
+        placemark.events.add('click', function () {
+            map.setZoom(18);
+        });
+    }
+</script>
+
+</body>
+</html>

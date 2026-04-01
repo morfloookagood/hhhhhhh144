@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мастер-классы | Aroma Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #ffffff; color: #1a1a1a; line-height: 1.5; overflow-x: hidden; }
+        :root {
+            --accent-dark: #a57c52;
+            --text-dark: #1f1f1f;
+            --text-muted: #5a5a5a;
+            --border-light: #eaeaea;
+            --bg-light: #f9f9f9;
+        }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+        .btn { display: inline-block; background: var(--text-dark); color: white; padding: 12px 28px; border-radius: 40px; text-decoration: none; font-weight: 500; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; }
+        .btn:hover { background: var(--accent-dark); transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid var(--text-dark); color: var(--text-dark); }
+        .btn-outline:hover { background: var(--text-dark); color: white; }
+        
+        header { padding: 24px 0; position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); z-index: 100; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .logo { font-size: 1.6rem; font-weight: 600; text-decoration: none; color: var(--text-dark); }
+        .logo span { color: var(--accent-dark); }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-dark); }
+        
+        .page-title { padding: 60px 0 40px; background: var(--bg-light); }
+        h1 { font-size: 3rem; font-weight: 500; }
+        .section-subtitle { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-dark); margin-bottom: 1rem; }
+        
+        .master-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; padding: 60px 0; }
+        .master-card { 
+            background: white; 
+            border-radius: 32px; 
+            overflow: hidden; 
+            border: 1px solid var(--border-light); 
+            transition: all 0.25s; 
+            cursor: pointer;
+        }
+        .master-card:hover { transform: translateY(-8px); box-shadow: 0 12px 28px rgba(0,0,0,0.05); }
+        .master-img { 
+            height: 240px; 
+            overflow: hidden;
+            background-color: #f5f0ea;
+        }
+        .master-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+        .master-card:hover .master-img img {
+            transform: scale(1.05);
+        }
+        .master-content { padding: 32px; }
+        .master-content h3 { font-size: 1.6rem; margin-bottom: 12px; font-weight: 600; }
+        .master-content p { color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+        .price { font-weight: 700; font-size: 1.3rem; color: var(--accent-dark); margin-top: 16px; display: inline-block; }
+        .duration { color: var(--text-muted); font-size: 0.9rem; margin-left: 16px; display: inline-block; }
+        .features-preview { margin: 16px 0; }
+        .features-preview span { background: var(--bg-light); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-right: 8px; display: inline-block; margin-bottom: 8px; }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-container {
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            background: white;
+            border-radius: 40px;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-container { transform: scale(1); }
+        .modal-header { 
+            padding: 28px 32px 20px 32px; 
+            border-bottom: 1px solid var(--border-light); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-radius: 40px 40px 0 0;
+        }
+        .modal-header h2 { font-size: 1.8rem; font-weight: 600; }
+        .modal-close { 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%; 
+            background: var(--bg-light); 
+            border: none; 
+            font-size: 1.4rem; 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        .modal-close:hover { background: var(--accent-dark); color: white; transform: rotate(90deg); }
+        .modal-content { padding: 32px; }
+        .modal-img-large {
+            width: 100%;
+            height: 220px;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .modal-img-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .modal-description { margin-bottom: 24px; line-height: 1.7; }
+        .modal-features {
+            background: var(--bg-light);
+            padding: 24px;
+            border-radius: 24px;
+            margin: 24px 0;
+        }
+        .modal-features h4 { margin-bottom: 16px; font-size: 1.1rem; color: var(--accent-dark); }
+        .modal-features ul { list-style: none; }
+        .modal-features li { margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+        .modal-features i { color: var(--accent-dark); width: 24px; }
+        .modal-info { display: flex; gap: 24px; justify-content: center; margin: 24px 0; flex-wrap: wrap; }
+        .modal-info-item { text-align: center; }
+        .modal-info-item .label { font-size: 0.8rem; color: var(--text-muted); }
+        .modal-info-item .value { font-size: 1.3rem; font-weight: 600; color: var(--accent-dark); }
+        .modal-price { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            color: var(--accent-dark); 
+            text-align: center; 
+            margin: 24px 0;
+        }
+        .modal-actions { display: flex; gap: 16px; margin-top: 24px; justify-content: center; flex-wrap: wrap; }
+        
+        footer { background: #faf8f5; padding: 48px 0 32px; border-top: 1px solid var(--border-light); margin-top: 40px; }
+        .footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; }
+        .footer-col h4 { font-weight: 500; margin-bottom: 16px; }
+        .footer-col a { color: var(--text-muted); text-decoration: none; display: block; margin-bottom: 8px; }
+        .footer-col a:hover { color: var(--accent-dark); }
+        
+        .toast-msg { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #1a1a1a; 
+            color: white; 
+            padding: 12px 24px; 
+            border-radius: 50px; 
+            font-size: 0.9rem; 
+            z-index: 1100; 
+            opacity: 0; 
+            transition: opacity 0.3s; 
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) { 
+            .container { padding: 0 24px; } 
+            .nav-links { gap: 1rem; } 
+            h1 { font-size: 2rem; } 
+            .modal-header h2 { font-size: 1.4rem; }
+            .modal-container { width: 95%; }
+            .master-grid { grid-template-columns: 1fr; }
+            .master-img { height: 200px; }
+            .toast-msg { white-space: normal; text-align: center; max-width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toast" class="toast-msg"></div>
+
+<header>
+    <div class="container header-flex">
+        <a href="index.html" class="logo">AROMA<span>LAB</span></a>
+        <ul class="nav-links">
+            <li><a href="services.html">Услуги</a></li>
+            <li><a href="catalog.html">Ароматы</a></li>
+            <li><a href="masterclass.html" class="active">Мастер-классы</a></li>
+            <li><a href="contacts.html">Контакты</a></li>
+        </ul>
+    </div>
+</header>
+
+<main>
+    <section class="page-title">
+        <div class="container">
+            <div class="section-subtitle">Обучение</div>
+            <h1>Мастер-классы по парфюмерии</h1>
+            <p style="color: var(--text-muted); max-width: 600px;">Погрузитесь в мир запахов и создайте свой уникальный аромат под руководством опытных парфюмеров</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="master-grid" id="masterGrid"></div>
+    </div>
+</main>
+
+<footer>
+    <div class="container footer-grid">
+        <div class="footer-col">
+            <h4>Aroma Lab</h4>
+            <p>Парфюмерная лаборатория с 2018 года. Обучаем искусству создания ароматов.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Разделы</h4>
+            <a href="services.html">Услуги</a>
+            <a href="catalog.html">Ароматы</a>
+            <a href="masterclass.html">Мастер-классы</a>
+            <a href="contacts.html">Контакты</a>
+        </div>
+        <div class="footer-col">
+            <h4>Контакты</h4>
+            <p>+7 (495) 123-45-67</p>
+            <p>hello@aroma-lab.ru</p>
+            <p>Москва, ул. Ароматная, 12</p>
+        </div>
+    </div>
+    <div class="container" style="margin-top: 40px; text-align: center; border-top: 1px solid var(--border-light); padding-top: 24px;">
+        <p style="font-size: 0.8rem;">© 2025 AROMA LAB — искусство ароматов. Все права защищены.</p>
+    </div>
+</footer>
+
+<script>
+    // Данные мастер-классов
+    const masterclasses = [
+        { 
+            id: 1, 
+            title: "Базовый курс 'Нос'", 
+            shortDesc: "2-часовой интенсив: знакомство с нотами, создание простой композиции. Идеально для начинающих.",
+            fullDesc: "Базовый курс 'Нос' — это идеальный старт в мир парфюмерии. За 2 часа вы узнаете основы ольфакторики, научитесь различать ноты ароматов и создадите свою первую авторскую композицию. Курс подходит для абсолютных новичков без опыта.",
+            features: [
+                "Знакомство с парфюмерными нотами",
+                "Теория построения ароматической пирамиды",
+                "30+ ароматических эссенций для работы",
+                "Создание 1 авторского аромата 50 мл",
+                "Красивая упаковка и именная этикетка",
+                "Сертификат участника"
+            ],
+            duration: "2 часа",
+            groupSize: "до 6 человек",
+            price: "4 500 ₽",
+            img: "https://as2.ftcdn.net/v2/jpg/03/03/85/65/1000_F_303856501_1ySX4UNID4PS0zfk5Zvee0Fzur8daydR.jpg"
+        },
+        { 
+            id: 2, 
+            title: "Продвинутый уровень", 
+            shortDesc: "4-часовой мастер-класс для тех, кто хочет углубиться в искусство парфюмерии.",
+            fullDesc: "Продвинутый курс для тех, кто уже знаком с основами парфюмерии или хочет сразу погрузиться в профессию. Вы изучите сложные техники составления ароматов, работу с аккордами и создадите полноценную парфюмерную композицию.",
+            features: [
+                "Углубленное изучение аккордов",
+                "Работа с 50+ редкими ингредиентами",
+                "Создание 2 авторских ароматов",
+                "Персональный парфюмерный дневник",
+                "Разбор ошибок и рекомендации",
+                "Премиальная упаковка"
+            ],
+            duration: "4 часа",
+            groupSize: "до 4 человек",
+            price: "7 900 ₽",
+            img: "https://t3.ftcdn.net/jpg/05/54/13/56/240_F_554135688_P7QbKLzdbuuW6qnRhAk80YqgoQKLG1VP.jpg"
+        },
+        { 
+            id: 3, 
+            title: "Групповой мастер-класс", 
+            shortDesc: "Идеальный формат для дня рождения, девичника или корпоратива.",
+            fullDesc: "Групповой мастер-класс — это увлекательное парфюмерное приключение в кругу близких людей. Идеально подходит для празднования дня рождения, девичника, корпоратива или тимбилдинга. Каждый участник создаст свой уникальный аромат.",
+            features: [
+                "Группа до 10 человек",
+                "Легкая теория и много практики",
+                "Создание 1 авторского аромата на человека",
+                "Фуршет и прохладительные напитки",
+                "Фотограф в подарок (при группе от 6 чел)",
+                "Подарочные сертификаты"
+            ],
+            duration: "2.5 часа",
+            groupSize: "до 10 человек",
+            price: "от 6 500 ₽/чел",
+            img: "https://t4.ftcdn.net/jpg/02/00/59/07/240_F_200590786_EO2AdPQnStOAv0btL5k1DJchEQC1gLNk.jpg"
+        },
+        { 
+            id: 4, 
+            title: "Корпоративный тимбилдинг", 
+            shortDesc: "Выездной мастер-класс для компаний. Создайте корпоративный аромат.",
+            fullDesc: "Уникальный формат корпоративного мероприятия, который объединяет команду. Участники не только узнают секреты парфюмерного искусства, но и создадут общий аромат компании или индивидуальные духи. Выезд в офис или на площадку клиента.",
+            features: [
+                "Выезд в офис или на площадку",
+                "Группа до 30 человек",
+                "Создание брендированного аромата",
+                "Командообразующие активности",
+                "Фуршет и фотосессия",
+                "Подарки и сертификаты"
+            ],
+            duration: "3 часа",
+            groupSize: "до 30 человек",
+            price: "от 35 000 ₽",
+            img: "https://t4.ftcdn.net/jpg/17/73/90/15/240_F_1773901576_XUPaHLt47aJpVBtShGKRX50YEw3nT9eU.jpg"
+        },
+        { 
+            id: 5, 
+            title: "Романтический мастер-класс", 
+            shortDesc: "Создайте аромат любви вдвоем. Идеальный подарок для второй половинки.",
+            fullDesc: "Особый мастер-класс для пар. Вы создадите два аромата, которые будут дополнять друг друга, или один общий аромат любви. Романтическая атмосфера, шампанское и незабываемые эмоции гарантированы.",
+            features: [
+                "Индивидуальная работа с парфюмером",
+                "Создание 2 ароматов (по одному на каждого)",
+                "Фотографии процесса",
+                "Шампанское и десерты",
+                "Романтическая упаковка",
+                "Сертификат на двоих"
+            ],
+            duration: "2 часа",
+            groupSize: "2 человека",
+            price: "12 900 ₽ (на двоих)",
+            img: "https://t4.ftcdn.net/jpg/15/66/33/23/240_F_1566332342_KFQpUA82PlRarptIuac9Hs0AIQbCYZ02.jpg"
+        },
+        { 
+            id: 6, 
+            title: "Детский мастер-класс", 
+            shortDesc: "Увлекательное знакомство с миром ароматов для детей от 7 до 14 лет.",
+            fullDesc: "Безопасный и познавательный мастер-класс для детей. В игровой форме ребята узнают о запахах, научатся различать ароматы и создадут свой первый парфюм. Используются только гипоаллергенные и безопасные компоненты.",
+            features: [
+                "Адаптированная программа для детей",
+                "Безопасные гипоаллергенные компоненты",
+                "Создание аромата 30 мл",
+                "Яркая детская упаковка",
+                "Диплом юного парфюмера",
+                "Сопровождение родителей"
+            ],
+            duration: "1.5 часа",
+            groupSize: "до 8 детей",
+            price: "3 500 ₽",
+            img: "https://t4.ftcdn.net/jpg/10/04/01/19/240_F_1004011907_Yl39SNP5CiGP7VhEOT2sGg6C9nR0YwSH.jpg"
+        }
+    ];
+
+    let currentModal = null;
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 3000);
+    }
+
+    function openModal(id) {
+        const mc = masterclasses.find(m => m.id === id);
+        if (!mc) return;
+        
+        if (currentModal) {
+            closeModal();
+        }
+        
+        const modalHtml = `
+            <div class="modal-overlay" id="masterModal">
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h2>${escapeHtml(mc.title)}</h2>
+                        <button class="modal-close" onclick="closeModal()">✕</button>
+                    </div>
+                    <div class="modal-content">
+                        <div class="modal-img-large">
+                            <img src="${mc.img}" alt="${escapeHtml(mc.title)}" onerror="this.src='https://placehold.co/1200x600/f5f0ea/a57c52?text=AROMA+LAB'">
+                        </div>
+                        <p class="modal-description">${escapeHtml(mc.fullDesc)}</p>
+                        <div class="modal-features">
+                            <h4><i class="fas fa-list-check"></i> Что вас ждет:</h4>
+                            <ul>
+                                ${mc.features.map(f => `<li><i class="fas fa-check-circle"></i> ${escapeHtml(f)}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="modal-info">
+                            <div class="modal-info-item">
+                                <div class="label"><i class="fas fa-clock"></i> Длительность</div>
+                                <div class="value">${escapeHtml(mc.duration)}</div>
+                            </div>
+                            <div class="modal-info-item">
+                                <div class="label"><i class="fas fa-users"></i> Группа</div>
+                                <div class="value">${escapeHtml(mc.groupSize)}</div>
+                            </div>
+                        </div>
+                        <div class="modal-price">${escapeHtml(mc.price)}</div>
+                        <div class="modal-actions">
+                            <button class="btn" onclick="bookMasterclass('${escapeHtml(mc.title)}')">
+                                <i class="fas fa-calendar-check"></i> Записаться
+                            </button>
+                            <button class="btn btn-outline" onclick="closeModal()">Закрыть</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        currentModal = document.getElementById('masterModal');
+        
+        setTimeout(() => currentModal.classList.add('active'), 10);
+        
+        currentModal.addEventListener('click', (e) => {
+            if (e.target === currentModal) closeModal();
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    }
+    
+    function closeModal() {
+        if (currentModal) {
+            currentModal.classList.remove('active');
+            setTimeout(() => {
+                if (currentModal) currentModal.remove();
+                currentModal = null;
+            }, 300);
+        }
+    }
+    
+    function bookMasterclass(title) {
+        closeModal();
+        showToast(`Заявка на "${title}" отправлена! Мы свяжемся с вами.`);
+        setTimeout(() => {
+            window.location.href = `contacts.html?service=${encodeURIComponent(title)}`;
+        }, 1500);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function renderCards() {
+        const grid = document.getElementById('masterGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = masterclasses.map(mc => `
+            <div class="master-card" onclick="openModal(${mc.id})">
+                <div class="master-img">
+                    <img src="${mc.img}" alt="${escapeHtml(mc.title)}" loading="lazy" onerror="this.src='https://placehold.co/800x500/f5f0ea/a57c52?text=AROMA+LAB'">
+                </div>
+                <div class="master-content">
+                    <h3>${escapeHtml(mc.title)}</h3>
+                    <p>${escapeHtml(mc.shortDesc)}</p>
+                    <div class="features-preview">
+                        ${mc.features.slice(0, 2).map(f => `<span>${escapeHtml(f.substring(0, 30))}${f.length > 30 ? '...' : ''}</span>`).join('')}
+                    </div>
+                    <div>
+                        <span class="price">${escapeHtml(mc.price)}</span>
+                        <span class="duration"><i class="fas fa-clock"></i> ${escapeHtml(mc.duration)}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    document.addEventListener('DOMContentLoaded', renderCards);
+    
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.bookMasterclass = bookMasterclass;
+    window.showToast = showToast;
+</script>
+</body>
+</html>
